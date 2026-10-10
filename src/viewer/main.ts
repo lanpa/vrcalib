@@ -1,5 +1,5 @@
 import './viewer.css';
-import type { DeviceParams } from '../profile/codec';
+import { parseProfileInput, toCfgUri, type DeviceParams } from '../profile/codec';
 import { defaultParams } from '../profile/defaults';
 import { normalize } from '../profile/rules';
 import { heightMeters, leftEyeFov, widthMeters, type Screen } from './cardboardView';
@@ -24,7 +24,7 @@ const isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.
 const isIOSChrome = isIOS && /CriOS/.test(ua);
 const debug = new URLSearchParams(location.search).has('debug');
 
-// Milestone 4 replaces this with the profile from the Firebase session.
+// Until the editor's session arrives (or without one), show Cardboard v1.
 let device: DeviceParams = normalize(defaultParams());
 let showCenter = true;
 let ppi = initialPpi();
@@ -146,10 +146,52 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-/** Used by the live link (milestone 4) and by tests. */
-export function setDevice(p: DeviceParams): void {
+function setDevice(p: DeviceParams): void {
   device = normalize(p);
   requestRender();
+}
+
+// --- Live link to the editor (?s=<session id> from the pairing QR)
+
+const linkStatus = $('link-status');
+function setLink(state: 'none' | 'connecting' | 'live' | 'missing' | 'error', detail = ''): void {
+  linkStatus.dataset.state = state;
+  linkStatus.textContent = {
+    none: 'Not linked to an editor: showing Cardboard v1. Open the viewer by scanning the QR code in the editor.',
+    connecting: 'Connecting to the editor…',
+    live: 'Linked to the editor: changes there show up here live.',
+    missing: 'Waiting for the editor. If this persists, scan the QR code in the editor again.',
+    error: `Can't reach the editor (${detail}). Showing the last profile received.`,
+  }[state];
+}
+
+const sid = new URLSearchParams(location.search).get('s');
+if (!sid) {
+  setLink('none');
+} else {
+  setLink('connecting');
+  void import('../sync/session')
+    .then(({ isSessionId, watchSession }) => {
+      if (!isSessionId(sid)) throw new Error('bad session id in the link');
+      return watchSession(
+        sid,
+        (state) => {
+          if (!state) {
+            setLink('missing');
+            return;
+          }
+          try {
+            showCenter = state.showLensCenter;
+            setDevice(parseProfileInput(state.paramsUri));
+            setLink('live');
+          } catch (e) {
+            setLink('error', e instanceof Error ? e.message : String(e));
+          }
+        },
+        (e) => setLink('error', e.message),
+      );
+    })
+    .catch((e: unknown) => setLink('error', e instanceof Error ? e.message : String(e)));
 }
 (window as unknown as { vrcalib: unknown }).vrcalib = {
   setDevice,
@@ -157,6 +199,8 @@ export function setDevice(p: DeviceParams): void {
     showCenter = on;
     requestRender();
   },
+  /** Current state, for tests. */
+  state: () => ({ profile: toCfgUri(device), showCenter }),
   /** Renders now and returns the RGBA at (x, y) from the bottom-left (tests). */
   probe: (x: number, y: number) => {
     draw();

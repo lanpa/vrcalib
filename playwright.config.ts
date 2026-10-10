@@ -10,5 +10,8 @@ export default defineConfig({
     command: `npx vite --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}/vrcalib/`,
     reuseExistingServer: !process.env.CI,
+    // Talk to the local Firebase emulators, never the real project.
+    // `npm run test:e2e` starts them (firebase emulators:exec).
+    env: { VITE_FIREBASE_EMULATOR: '1' },
   },
 });

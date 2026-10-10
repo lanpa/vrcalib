@@ -38,6 +38,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -91,9 +95,74 @@ h2 {
   padding: 16px;
 }
 
-.output {
-  position: sticky;
-  top: 12px;
+.side {
+  display: grid;
+  gap: 16px;
+}
+
+.steps {
+  margin: 0 0 14px;
+  font-size: 14px;
+}
+
+.steps summary {
+  cursor: pointer;
+  color: var(--accent);
+}
+
+.steps ol {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.steps li {
+  margin-bottom: 4px;
+}
+
+.link-status {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.link-status::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  vertical-align: 1px;
+}
+
+.link-status[data-state='phone']::before {
+  background: var(--ok);
+}
+
+.link-status[data-state='error'] {
+  color: var(--error);
+}
+
+.link-status[data-state='error']::before {
+  background: var(--error);
+}
+
+#pair-qr {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  margin: 0 auto 8px;
+  border-radius: 6px;
+  image-rendering: pixelated;
+}
+
+.pair-link {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--accent);
+  word-break: break-all;
 }
 
 fieldset {

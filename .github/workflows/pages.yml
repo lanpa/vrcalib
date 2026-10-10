@@ -25,6 +25,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      # The Firebase emulators (for the e2e tests) need Java.
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - run: npm run build

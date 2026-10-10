@@ -16,6 +16,22 @@
       <section class="panel" aria-labelledby="profile-heading">
         <h2 id="profile-heading">Viewer profile</h2>
 
+        <details class="steps">
+          <summary>How to calibrate</summary>
+          <ol>
+            <li>Scan the phone QR code (right) with the phone. Enter its PPI if asked and tap
+              <strong>Start</strong>, then put the phone in the viewer.</li>
+            <li>Measure with a ruler and enter screen-to-lens, inter-lens and tray-to-lens distances.</li>
+            <li>Fine-tune inter-lens and tray-to-lens until each red dot sits in the middle of its
+              lens and the two images fuse.</li>
+            <li>Tune k1, then k2, until grid lines are straight right to the edges. Lines bowing
+              outward (pincushion): raise k1. Bowing inward (barrel): lower it. k2 mostly affects
+              the outer edge.</li>
+            <li>Reduce field-of-view angles only to trim leftover red at the edges.</li>
+            <li>Scan the export QR code with a Cardboard app.</li>
+          </ol>
+        </details>
+
         <div class="import">
           <label for="import-input">Start from an existing profile</label>
           <div class="import-row">
@@ -104,7 +120,17 @@
         </form>
       </section>
 
-      <section class="panel output" aria-labelledby="export-heading">
+      <div class="side">
+      <section class="panel" aria-labelledby="phone-heading">
+        <h2 id="phone-heading">Phone</h2>
+        <p id="link-status" class="link-status" data-state="connecting" role="status">Connecting…</p>
+        <canvas id="pair-qr" width="200" height="200" aria-label="QR code to open the viewer on the phone" hidden></canvas>
+        <p class="hint">Scan with the phone's camera to open the viewer. It updates live as you edit.</p>
+        <a id="pair-link" class="pair-link" href="#" target="_blank" rel="noopener" hidden>Viewer link</a>
+        <label class="check"><input id="show-center" type="checkbox" checked /> Show red lens-centre dots</label>
+      </section>
+
+      <section class="panel" aria-labelledby="export-heading">
         <h2 id="export-heading">Export</h2>
         <p class="hint">Scan this QR code with a Cardboard app to use the profile.</p>
         <canvas id="qr" width="240" height="240" aria-label="Profile QR code"></canvas>
@@ -116,6 +142,7 @@
         <code id="cfg-uri" class="uri"></code>
         <ul id="warnings" class="warnings"></ul>
       </section>
+      </div>
     </main>
 
     <script type="module" src="/src/editor/main.ts"></script>

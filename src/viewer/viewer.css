@@ -100,6 +100,19 @@ button:disabled {
   font-variant-numeric: tabular-nums;
 }
 
+.link-status {
+  margin: 0 0 14px;
+  font-size: 14px;
+}
+
+.link-status[data-state='live'] {
+  color: #7ee787;
+}
+
+.link-status[data-state='error'] {
+  color: #ff7b72;
+}
+
 .notice {
   margin: 10px 0 0;
   padding: 10px 12px;

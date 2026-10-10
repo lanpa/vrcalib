@@ -1,0 +1,27 @@
+{
+  "rules": {
+    "sessions": {
+      "$sid": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || data.child('owner').val() === auth.uid)",
+        ".validate": "$sid.matches(/^[A-Za-z0-9_-]{22}$/) && newData.hasChildren(['owner', 'params_uri', 'show_lens_center', 'updated'])",
+        "owner": { ".validate": "newData.val() === auth.uid" },
+        "params_uri": {
+          ".validate": "newData.isString() && newData.val().beginsWith('http://google.com/cardboard/cfg?p=') && newData.val().length <= 1024"
+        },
+        "show_lens_center": { ".validate": "newData.isBoolean()" },
+        "updated": { ".validate": "newData.val() === now" },
+        "$other": { ".validate": false }
+      }
+    },
+    "presence": {
+      "$sid": {
+        ".read": "auth != null",
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.val() === true && root.child('sessions').child($sid).exists()"
+        }
+      }
+    }
+  }
+}

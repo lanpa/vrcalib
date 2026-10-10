@@ -4,6 +4,7 @@ import { defaultParams } from '../profile/defaults';
 import { warnings } from '../profile/rules';
 import { DistortionCurve } from './curve';
 import { ProfileForm } from './form';
+import { PhoneLink } from './link';
 import { downloadQrPng, drawQr, qrFilename } from './qr';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -16,8 +17,19 @@ const importInput = $<HTMLInputElement>('import-input');
 const importStatus = $('import-status');
 const curve = new DistortionCurve(document.getElementById('curve') as unknown as SVGSVGElement, $('curve-caption'));
 
+const showCenterInput = $<HTMLInputElement>('show-center');
+const link = new PhoneLink({
+  status: $('link-status'),
+  pairQr: $<HTMLCanvasElement>('pair-qr'),
+  pairLink: $<HTMLAnchorElement>('pair-link'),
+});
+
 let current: DeviceParams;
 let qrPending = false;
+
+function pushToPhone(): void {
+  link.update({ paramsUri: toCfgUri(current), showLensCenter: showCenterInput.checked });
+}
 
 function onChange(p: DeviceParams): void {
   current = p;
@@ -28,6 +40,7 @@ function onChange(p: DeviceParams): void {
     ...warnings(p).map((w) => Object.assign(document.createElement('li'), { textContent: w })),
   );
   copyStatus.textContent = '';
+  pushToPhone();
   // Coalesce bursts of key repeats into one redraw per frame.
   if (!qrPending) {
     qrPending = true;
@@ -72,5 +85,19 @@ $('copy-button').addEventListener('click', async () => {
     copyStatus.textContent = 'Link copied.';
   } catch {
     copyStatus.textContent = 'Copy failed; select the link below and copy it.';
+  }
+});
+
+showCenterInput.addEventListener('change', pushToPhone);
+
+// Resuming a session (?s= in the URL, owned by this browser) restores its profile.
+void link.start().then((resumed) => {
+  if (!resumed) return;
+  try {
+    showCenterInput.checked = resumed.showLensCenter;
+    form.load(parseProfileInput(resumed.paramsUri));
+  } catch {
+    // A stored profile we can't read: keep the current one, which is pushed next.
+    pushToPhone();
   }
 });
