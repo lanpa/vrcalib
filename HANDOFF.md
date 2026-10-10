@@ -4,6 +4,17 @@ Starting brief for a new repo. It rebuilds the calibration half of Google's
 retired Cardboard "viewer profile generator" (wwgc) as a static site, and
 records everything learned while reverse-engineering the original.
 
+## Status (2026-10-10)
+
+Milestones 1–4 are done and live at https://lanpa.github.io/vrcalib/,
+verified on the test phone (OPPO 10x, 387 PPI: canvas = screen =
+2340×1080 in fullscreen; live sync and presence work). Firebase project
+`vrcalib` (RTDB in us-central1) has `database.rules.json` published by hand
+in the console. Milestone 5 (polish) is next.
+
+Testing: `npm test` (unit), `npm run test:e2e` (Playwright under the
+Firebase emulators; needs Java 21 on PATH). CI runs both before deploying.
+
 ## 1. Goal
 
 Let someone with a Cardboard-style viewer **find** its parameters (lens
