@@ -6,6 +6,7 @@ import { DistortionCurve } from './curve';
 import { bindGeometryDiagram } from './diagram';
 import { ProfileForm } from './form';
 import { PhoneLink } from './link';
+import { formatValue, stepValue } from './fields';
 import { downloadQrPng, drawQr, qrFilename } from './qr';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -23,6 +24,8 @@ const setDiagramAlignment = bindGeometryDiagram(
   $<HTMLFormElement>('profile-form'),
 );
 const showCenterInput = $<HTMLInputElement>('show-center');
+const screenWidthInput = $<HTMLInputElement>('screen-width');
+let screenWidthMm: number | null = null;
 const link = new PhoneLink({
   status: $('link-status'),
   pairQr: $<HTMLCanvasElement>('pair-qr'),
@@ -33,7 +36,7 @@ let current: DeviceParams;
 let qrPending = false;
 
 function pushToPhone(): void {
-  link.update({ paramsUri: toCfgUri(current), showLensCenter: showCenterInput.checked });
+  link.update({ paramsUri: toCfgUri(current), showLensCenter: showCenterInput.checked, screenWidthMm });
 }
 
 function onChange(p: DeviceParams): void {
@@ -96,11 +99,45 @@ $('copy-button').addEventListener('click', async () => {
 
 showCenterInput.addEventListener('change', pushToPhone);
 
+// Phone screen width: a phone property, sent with the session so the phone can derive its PPI.
+const MIN_WIDTH_MM = 40;
+const MAX_WIDTH_MM = 400;
+function setScreenWidth(mm: number | null): void {
+  screenWidthMm = mm;
+  screenWidthInput.removeAttribute('aria-invalid');
+  pushToPhone();
+}
+screenWidthInput.addEventListener('input', () => {
+  const text = screenWidthInput.value.trim().replace(',', '.');
+  if (text === '') return setScreenWidth(null);
+  const mm = Number(text);
+  if (!/^\d+(\.\d*)?$/.test(text) || mm < MIN_WIDTH_MM || mm > MAX_WIDTH_MM) {
+    screenWidthInput.setAttribute('aria-invalid', 'true');
+    return;
+  }
+  setScreenWidth(mm);
+});
+screenWidthInput.addEventListener('keydown', (e) => {
+  if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+  e.preventDefault();
+  const start = screenWidthMm ?? 150;
+  const next = stepValue('mm', start / 1000, e.key === 'ArrowUp' ? 1 : -1, e.shiftKey) * 1000;
+  const mm = Math.min(MAX_WIDTH_MM, Math.max(MIN_WIDTH_MM, Number(next.toFixed(3))));
+  screenWidthInput.value = formatValue('mm', mm / 1000);
+  setScreenWidth(mm);
+});
+screenWidthInput.addEventListener('blur', () => {
+  screenWidthInput.value = screenWidthMm === null ? '' : formatValue('mm', screenWidthMm / 1000);
+  screenWidthInput.removeAttribute('aria-invalid');
+});
+
 // Resuming a session (?s= in the URL, owned by this browser) restores its profile.
 void link.start().then((resumed) => {
   if (!resumed) return;
   try {
     showCenterInput.checked = resumed.showLensCenter;
+    screenWidthMm = resumed.screenWidthMm;
+    screenWidthInput.value = screenWidthMm === null ? '' : formatValue('mm', screenWidthMm / 1000);
     form.load(parseProfileInput(resumed.paramsUri));
   } catch {
     // A stored profile we can't read: keep the current one, which is pushed next.

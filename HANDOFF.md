@@ -212,6 +212,8 @@ sessions/<sid>:            written by the laptop with set() on every change
   owner:            <laptop auth.uid>
   params_uri:       "http://google.com/cardboard/cfg?p=…"
   show_lens_center: true
+  screen_width_mm:  153.0   (optional; ruler-measured long side of the phone's
+                             lit screen; the viewer derives PPI from it)
   updated:          ServerValue.TIMESTAMP
 presence/<sid>/<phone uid>: true   (phone sets it, onDisconnect().remove())
 ```

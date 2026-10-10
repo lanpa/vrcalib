@@ -94,6 +94,10 @@ button:disabled {
   color: #9aa4b1;
 }
 
+.hint.source {
+  color: #7ee787;
+}
+
 .info {
   margin: 10px 0;
   font-size: 14px;

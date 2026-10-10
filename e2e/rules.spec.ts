@@ -86,10 +86,13 @@ test.describe('sessions', () => {
       session(a, { show_lens_center: 'yes' }),
       session(a, { updated: 12345 }),
       session(a, { extra: 1 }),
+      session(a, { screen_width_mm: 10 }),
+      session(a, { screen_width_mm: 'wide' }),
       { owner: a.uid, params_uri: V1, updated: { '.sv': 'timestamp' } },
     ];
-    // Control: the well-formed version is accepted.
+    // Control: the well-formed version is accepted, with or without a screen width.
     expect(await req('PUT', `sessions/${sid()}`, a, session(a))).toBe(200);
+    expect(await req('PUT', `sessions/${sid()}`, a, session(a, { screen_width_mm: 153 }))).toBe(200);
     for (const body of bad) expect(await req('PUT', `sessions/${sid()}`, a, body)).toBe(DENIED);
     for (const id of ['short', 'x'.repeat(23), 'x'.repeat(21) + '!']) {
       expect(await req('PUT', `sessions/${id}`, a, session(a))).toBe(DENIED);

@@ -10,6 +10,7 @@
           ".validate": "newData.isString() && newData.val().beginsWith('http://google.com/cardboard/cfg?p=') && newData.val().length <= 1024"
         },
         "show_lens_center": { ".validate": "newData.isBoolean()" },
+        "screen_width_mm": { ".validate": "newData.isNumber() && newData.val() >= 40 && newData.val() <= 400" },
         "updated": { ".validate": "newData.val() === now" },
         "$other": { ".validate": false }
       }

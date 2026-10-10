@@ -70,7 +70,25 @@ function updateScreenInfo(): void {
 }
 
 if (ppi) ppiInput.value = String(ppi);
-ppiInput.addEventListener('input', updateScreenInfo);
+ppiInput.addEventListener('input', () => {
+  $('ppi-source').hidden = true;
+  updateScreenInfo();
+});
+
+/** PPI from the screen width measured with a ruler and entered in the editor. */
+function applyMeasuredWidth(mm: number): void {
+  const [longPx] = physicalScreenPx();
+  const derived = Math.round(((longPx * 25.4) / mm) * 10) / 10;
+  if (!isValidPpi(derived) || derived === ppi) return;
+  ppi = derived;
+  savePpi(derived);
+  ppiInput.value = String(derived);
+  const source = $('ppi-source');
+  source.textContent = `From the editor: ${longPx} px across a measured ${mm.toFixed(1)} mm.`;
+  source.hidden = false;
+  updateScreenInfo();
+  requestRender();
+}
 updateScreenInfo();
 
 // --- Start: fullscreen + landscape + wake lock, from the user's tap
@@ -183,6 +201,7 @@ if (!sid) {
           }
           try {
             showCenter = state.showLensCenter;
+            if (state.screenWidthMm !== null) applyMeasuredWidth(state.screenWidthMm);
             setDevice(parseProfileInput(state.paramsUri));
             setLink('live');
           } catch (e) {
@@ -201,7 +220,7 @@ if (!sid) {
     requestRender();
   },
   /** Current state, for tests. */
-  state: () => ({ profile: toCfgUri(device), showCenter }),
+  state: () => ({ profile: toCfgUri(device), showCenter, ppi }),
   /** Renders now and returns the RGBA at (x, y) from the bottom-left (tests). */
   probe: (x: number, y: number) => {
     draw();

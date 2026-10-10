@@ -8,6 +8,7 @@ const field = (page: Page, name: string) => page.locator(`#profile-form [name="$
 interface ViewerState {
   profile: string;
   showCenter: boolean;
+  ppi: number | null;
 }
 const viewerState = (page: Page) =>
   page.evaluate(() => (window as unknown as { vrcalib: { state(): ViewerState } }).vrcalib.state());
@@ -42,6 +43,16 @@ test('the phone follows the editor live, and the editor sees the phone', async (
   await page.locator('#show-center').uncheck();
   await expect.poll(async () => (await viewerState(phone)).showCenter).toBe(false);
 
+  // A width measured on the laptop becomes the phone's PPI: long side px × 25.4 / mm.
+  const longPx = await phone.evaluate(() =>
+    Math.round(Math.max(screen.width, screen.height) * devicePixelRatio),
+  );
+  await page.locator('#screen-width').fill('153');
+  const expected = Math.round(((longPx * 25.4) / 153) * 10) / 10;
+  await expect.poll(async () => (await viewerState(phone)).ppi).toBe(expected);
+  await expect(phone.locator('#ppi')).toHaveValue(String(expected));
+  await expect(phone.locator('#ppi-source')).toContainText('153.0 mm');
+
   // The phone leaves → the editor notices.
   await phoneContext.close();
   await expect(page.locator('#link-status')).toHaveAttribute('data-state', 'waiting');
@@ -51,12 +62,14 @@ test('reloading the editor resumes its session and profile', async ({ page }) =>
   const sid = await openEditor(page);
   await field(page, 'k1').fill('0.42');
   await field(page, 'model').fill('Resumed viewer');
+  await page.locator('#screen-width').fill('149.5');
   await page.waitForTimeout(300); // let the write reach the emulator
   await page.reload();
   await expect(page.locator('#link-status')).toHaveAttribute('data-state', 'waiting');
   expect(new URL(page.url()).searchParams.get('s')).toBe(sid);
   await expect(field(page, 'k1')).toHaveValue('0.420');
   await expect(field(page, 'model')).toHaveValue('Resumed viewer');
+  await expect(page.locator('#screen-width')).toHaveValue('149.5');
 });
 
 test("another browser can't take over a session: it gets its own", async ({ page, browser }) => {

@@ -188,6 +188,13 @@
         <canvas id="pair-qr" width="200" height="200" aria-label="QR code to open the viewer on the phone" hidden></canvas>
         <p class="hint">Scan with the phone's camera to open the viewer. It updates live as you edit.</p>
         <a id="pair-link" class="pair-link" href="#" target="_blank" rel="noopener" hidden>Viewer link</a>
+        <label class="screen-width">Phone screen width (measured)
+          <span class="num"><input id="screen-width" type="text" inputmode="decimal" placeholder="e.g. 153.0" autocomplete="off" spellcheck="false" /><span class="unit">mm</span></span>
+        </label>
+        <p class="hint">
+          With the viewer fullscreen, measure the lit screen along its long side, edge to edge.
+          The phone works out its pixels per inch from this, so nobody needs a spec sheet.
+        </p>
         <label class="check"><input id="show-center" type="checkbox" checked /> Show red lens-centre dots</label>
       </section>
 

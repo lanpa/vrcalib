@@ -21,6 +21,8 @@ import { db, signIn } from './firebase';
 export interface SessionState {
   paramsUri: string;
   showLensCenter: boolean;
+  /** The phone's lit screen, long side, as measured with a ruler. Null until entered. */
+  screenWidthMm: number | null;
 }
 
 const SID_PATTERN = /^[A-Za-z0-9_-]{22}$/;
@@ -37,7 +39,14 @@ interface StoredSession {
   owner: string;
   params_uri: string;
   show_lens_center: boolean;
+  screen_width_mm?: number;
 }
+
+const fromStored = (s: StoredSession): SessionState => ({
+  paramsUri: s.params_uri,
+  showLensCenter: s.show_lens_center !== false,
+  screenWidthMm: typeof s.screen_width_mm === 'number' ? s.screen_width_mm : null,
+});
 
 export class EditorSession {
   readonly sid: string;
@@ -66,7 +75,7 @@ export class EditorSession {
       if (stored.owner === uid) {
         return {
           session: new EditorSession(requested, uid, onError),
-          resumed: { paramsUri: stored.params_uri, showLensCenter: stored.show_lens_center },
+          resumed: fromStored(stored),
         };
       }
     }
@@ -78,6 +87,8 @@ export class EditorSession {
       owner: this.uid,
       params_uri: state.paramsUri,
       show_lens_center: state.showLensCenter,
+      // Firebase rejects undefined, so leave the key out until there is a value.
+      ...(state.screenWidthMm === null ? {} : { screen_width_mm: state.screenWidthMm }),
       updated: serverTimestamp(),
     };
     set(ref(db, `sessions/${this.sid}`), value).catch((e: unknown) =>
@@ -128,7 +139,7 @@ export async function watchSession(
       const existed = sessionExists;
       sessionExists = stored !== null;
       if (sessionExists && !existed) markPresent();
-      onState(stored && { paramsUri: stored.params_uri, showLensCenter: stored.show_lens_center !== false });
+      onState(stored && fromStored(stored));
     },
     (e) => onError(e),
   );

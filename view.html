@@ -19,8 +19,10 @@
         <form id="start-form" novalidate>
           <label for="ppi">Screen pixels per inch (PPI)</label>
           <input id="ppi" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 387" />
+          <p id="ppi-source" class="hint source" hidden></p>
           <p class="hint">
-            From the phone's spec sheet, e.g. GSMArena → Display → “ppi density”.
+            Or measure instead: enter the phone's screen width in the editor on your
+            laptop and this fills in by itself.
           </p>
           <p id="screen-info" class="info"></p>
           <button id="start" type="submit">Start</button>
