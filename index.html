@@ -79,6 +79,67 @@
               </label>
               <label>Tray to lens <span class="num"><input name="trayToLens" data-num /><span class="unit">mm</span></span></label>
             </div>
+            <figure class="geometry">
+              <svg id="geometry-diagram" viewBox="0 0 400 162" data-align="0" role="img"
+                aria-label="Where the four geometry values are measured. Top view: screen to lens is from the phone screen to the lens centres; inter-lens is between the two lens centres. Front view: tray to lens is from the tray the phone rests on to the lens centres.">
+                <!-- Top view: screen at the top, eyes at the bottom. -->
+                <text class="label" x="40" y="22" text-anchor="end">screen</text>
+                <rect class="phone" x="45" y="14" width="130" height="10" rx="2" />
+                <text class="label" x="55" y="73" text-anchor="end">lenses</text>
+                <ellipse class="lens" cx="80" cy="70" rx="20" ry="5" />
+                <ellipse class="lens" cx="140" cy="70" rx="20" ry="5" />
+                <text class="label" x="55" y="123" text-anchor="end">eyes</text>
+                <circle class="eye" cx="80" cy="120" r="5" />
+                <circle class="eye" cx="140" cy="120" r="5" />
+                <g class="dim" data-dim="screenToLens">
+                  <path class="ext" d="M100 70 H120" />
+                  <path d="M110 24 V70 M106 24 H114" />
+                  <text x="115" y="50">Screen to lens</text>
+                </g>
+                <g class="dim" data-dim="interLens">
+                  <path class="ext" d="M80 75 V92 M140 75 V92" />
+                  <path d="M80 88 H140 M80 84 V92 M140 84 V92" />
+                  <text x="110" y="102" text-anchor="middle">Inter-lens</text>
+                </g>
+                <text class="caption" x="110" y="154" text-anchor="middle">Top view</text>
+
+                <!-- Front view, as seen from the eyes: phone in landscape. -->
+                <rect class="phone" x="222" y="24" width="166" height="90" rx="8" />
+                <g data-align="0">
+                  <line class="tray" data-dim="verticalAlignment" x1="214" y1="117" x2="396" y2="117" />
+                  <text class="label" x="396" y="130" text-anchor="end">tray</text>
+                  <circle class="lens" cx="275" cy="76" r="19" />
+                  <circle class="lens" cx="335" cy="76" r="19" />
+                  <circle class="center-dot" cx="275" cy="76" r="2.5" />
+                  <circle class="center-dot" cx="335" cy="76" r="2.5" />
+                  <g class="dim" data-dim="trayToLens">
+                    <path d="M275 76 V117 M271 76 H279" />
+                    <text x="281" y="108">Tray to lens</text>
+                  </g>
+                </g>
+                <g data-align="2">
+                  <line class="tray" data-dim="verticalAlignment" x1="214" y1="21" x2="396" y2="21" />
+                  <text class="label" x="396" y="15" text-anchor="end">tray</text>
+                  <circle class="lens" cx="275" cy="62" r="19" />
+                  <circle class="lens" cx="335" cy="62" r="19" />
+                  <circle class="center-dot" cx="275" cy="62" r="2.5" />
+                  <circle class="center-dot" cx="335" cy="62" r="2.5" />
+                  <g class="dim" data-dim="trayToLens">
+                    <path d="M275 21 V62 M271 62 H279" />
+                    <text x="281" y="36">Tray to lens</text>
+                  </g>
+                </g>
+                <g data-align="1">
+                  <line class="centerline" data-dim="verticalAlignment" x1="222" y1="69" x2="388" y2="69" />
+                  <circle class="lens" cx="275" cy="69" r="19" />
+                  <circle class="lens" cx="335" cy="69" r="19" />
+                  <circle class="center-dot" cx="275" cy="69" r="2.5" />
+                  <circle class="center-dot" cx="335" cy="69" r="2.5" />
+                  <text class="label" x="305" y="106" text-anchor="middle">lenses centred on the screen</text>
+                </g>
+                <text class="caption" x="305" y="154" text-anchor="middle">Front view (from your eyes)</text>
+              </svg>
+            </figure>
           </fieldset>
 
           <fieldset>

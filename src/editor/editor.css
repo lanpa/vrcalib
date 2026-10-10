@@ -420,3 +420,96 @@ kbd {
   color: var(--warn-text);
   font-size: 13px;
 }
+
+/* Geometry diagram: where each distance is measured. */
+
+.geometry {
+  margin: 4px 0 10px;
+}
+
+.geometry svg {
+  display: block;
+  width: 100%;
+  max-width: 440px;
+  height: auto;
+}
+
+.geometry text {
+  fill: var(--muted);
+  font-size: 10px;
+}
+
+.geometry .caption {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.geometry .phone {
+  fill: var(--bg);
+  stroke: var(--muted);
+  stroke-width: 1;
+}
+
+.geometry .lens {
+  fill: var(--surface);
+  fill-opacity: 0.6;
+  stroke: var(--text);
+  stroke-width: 1.5;
+}
+
+.geometry .eye {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.5;
+}
+
+.geometry .center-dot {
+  fill: #e53935;
+}
+
+.geometry .tray {
+  stroke: var(--text);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.geometry .centerline {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.geometry .dim path {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.2;
+}
+
+.geometry .dim .ext {
+  stroke-dasharray: 2 2;
+}
+
+.geometry .dim.active path {
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+.geometry .dim.active text {
+  fill: var(--accent);
+  font-weight: 600;
+}
+
+.geometry .tray.active,
+.geometry .centerline.active {
+  stroke: var(--accent);
+}
+
+.geometry g[data-align] {
+  display: none;
+}
+
+.geometry svg[data-align='0'] g[data-align='0'],
+.geometry svg[data-align='1'] g[data-align='1'],
+.geometry svg[data-align='2'] g[data-align='2'] {
+  display: inline;
+}

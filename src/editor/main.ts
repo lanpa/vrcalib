@@ -3,6 +3,7 @@ import { parseProfileInput, toCfgUri, type DeviceParams } from '../profile/codec
 import { defaultParams } from '../profile/defaults';
 import { warnings } from '../profile/rules';
 import { DistortionCurve } from './curve';
+import { bindGeometryDiagram } from './diagram';
 import { ProfileForm } from './form';
 import { PhoneLink } from './link';
 import { downloadQrPng, drawQr, qrFilename } from './qr';
@@ -17,6 +18,10 @@ const importInput = $<HTMLInputElement>('import-input');
 const importStatus = $('import-status');
 const curve = new DistortionCurve(document.getElementById('curve') as unknown as SVGSVGElement, $('curve-caption'));
 
+const setDiagramAlignment = bindGeometryDiagram(
+  document.getElementById('geometry-diagram') as unknown as SVGSVGElement,
+  $<HTMLFormElement>('profile-form'),
+);
 const showCenterInput = $<HTMLInputElement>('show-center');
 const link = new PhoneLink({
   status: $('link-status'),
@@ -36,6 +41,7 @@ function onChange(p: DeviceParams): void {
   const uri = toCfgUri(p);
   uriEl.textContent = uri;
   curve.update(p.distortionCoefficients[0] ?? 0, p.distortionCoefficients[1] ?? 0);
+  setDiagramAlignment(p.verticalAlignment);
   warningsEl.replaceChildren(
     ...warnings(p).map((w) => Object.assign(document.createElement('li'), { textContent: w })),
   );
