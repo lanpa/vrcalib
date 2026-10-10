@@ -411,7 +411,11 @@ starting point.
 5. Tune k1, then k2, until grid lines are straight to the edges:
    lines bowing outward (pincushion) → raise k1; bowing inward (barrel) →
    lower it. k2 mostly affects the outer edge.
-6. Reduce FOV angles only to trim leftover red at the edges.
+6. Red visible inside the lens view means that side's FOV angle is too
+   small (nothing is drawn there; apps would show black): raise it until
+   the red is past the edge of the view. Optionally lower it back until red
+   just reappears at the rim, then one step up. Red that won't go away is
+   where the screen ends (e.g. the nose side, limited by half the screen).
 7. Export the QR from the editor; scan it in the Cardboard app.
 
 ## 11. Milestones
