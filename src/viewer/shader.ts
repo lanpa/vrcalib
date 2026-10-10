@@ -38,7 +38,12 @@ void main() {
 }
 `;
 
-/** Grid lines every CELL metres, about LINE_PX texture pixels wide at any distance. */
+/**
+ * Grid lines every CELL metres, about LINE_PX texture pixels wide at any
+ * distance, plus a bold cross through the centre of each face. On the front
+ * face that cross runs through straight ahead, where the red lens-centre dot
+ * is: unlike the repeating grid, it can't be fused one or two cells off.
+ */
 export const SCENE_FRAGMENT = /* glsl */ `#version 300 es
 precision highp float;
 in vec3 vPosition;
@@ -47,14 +52,21 @@ flat in vec3 vColor;
 out vec4 fragColor;
 const float CELL = 0.5;
 const float LINE_PX = 2.0;
+const float AXIS_PX = 5.0;
+const vec3 AXIS_COLOR = vec3(0.25, 0.9, 1.0);
+float lineMask(vec2 dist, float widthPx) {
+  return 1.0 - smoothstep(widthPx * 0.5 - 0.5, widthPx * 0.5 + 0.5, min(dist.x, dist.y));
+}
 void main() {
   vec3 n = abs(vNormal);
-  vec2 c = (n.x > 0.5 ? vPosition.zy : n.y > 0.5 ? vPosition.xz : vPosition.xy) / CELL;
-  vec2 d = abs(fract(c - 0.5) - 0.5) / fwidth(c);
-  float line = 1.0 - smoothstep(LINE_PX * 0.5 - 0.5, LINE_PX * 0.5 + 0.5, min(d.x, d.y));
+  vec2 p = n.x > 0.5 ? vPosition.zy : n.y > 0.5 ? vPosition.xz : vPosition.xy;
+  vec2 c = p / CELL;
+  float grid = lineMask(abs(fract(c - 0.5) - 0.5) / fwidth(c), LINE_PX);
+  float axis = lineMask(abs(p) / fwidth(p), AXIS_PX);
   vec3 base = vColor * 0.3;
   vec3 ink = mix(vColor, vec3(1.0), 0.65);
-  fragColor = vec4(mix(base, ink, line), 1.0);
+  vec3 color = mix(base, ink, grid);
+  fragColor = vec4(mix(color, AXIS_COLOR, axis), 1.0);
 }
 `;
 

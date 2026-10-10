@@ -62,7 +62,7 @@ test('PPI from the URL is remembered', async ({ page }) => {
   await expect(page.locator('#ppi')).toHaveValue(String(PPI));
 });
 
-test('red centre dots sit at the computed lens centres', async ({ page }) => {
+test('red centre dots sit at the computed lens centres, on the centre cross', async ({ page }) => {
   await page.goto(`view.html?ppi=${PPI}`);
   const [w, h] = await canvasSize(page);
   expect(w).toBeGreaterThan(h);
@@ -77,6 +77,15 @@ test('red centre dots sit at the computed lens centres', async ({ page }) => {
   expect(isRed(await probe(page, rightX, lensY))).toBe(true);
   // Away from the centre, the grid scene is drawn instead.
   expect(isRed(await probe(page, leftX + 40, lensY + 40))).toBe(false);
+
+  // Each dot sits exactly on the bold centre cross (the grid is at infinity),
+  // so just beside it, along both arms, is cross colour, in both eyes.
+  const isCross = ([r, g, b]: number[]) => r! < 140 && g! > 170 && b! > 200;
+  for (const x of [leftX, rightX]) {
+    for (const [dx, dy] of [[10, 0], [-10, 0], [0, 10], [0, -10]]) {
+      expect(isCross(await probe(page, x + dx, lensY + dy)), `cross at ${x + dx},${lensY + dy}`).toBe(true);
+    }
+  }
 
   await page.evaluate(() =>
     (window as unknown as { vrcalib: { setShowCenter(on: boolean): void } }).vrcalib.setShowCenter(false),

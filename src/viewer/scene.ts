@@ -1,5 +1,11 @@
 // WebGL2 renderer: a 10 m grid box seen from its centre, rendered per eye
 // into an offscreen texture, then barrel-distorted onto the screen.
+//
+// Both eyes render from the same point (no eye separation), which puts the
+// grid optically at infinity, at the same depth as the red lens-centre dots.
+// wwgc offset the cameras by ±IPD/2; with a 5 m wall that leaves each dot
+// ~0.4° off its grid line and the grid at a different depth from the dots,
+// which blurs the "do the dots merge?" check.
 // Draws on demand (profile change, resize), not every frame: the view is
 // fixed, since head tracking isn't needed for calibration.
 
@@ -51,9 +57,7 @@ function compile(gl: WebGL2RenderingContext, vs: string, fs: string): WebGLProgr
   return program;
 }
 
-function translateX(x: number): Float32Array {
-  return new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, 0, 0, 1]);
-}
+const IDENTITY = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
 export class StereoRenderer {
   readonly canvas: HTMLCanvasElement;
@@ -129,7 +133,7 @@ export class StereoRenderer {
     const half = Math.floor(w / 2);
     this.ensureFbo(w, h);
 
-    // Pass 1: each eye into its half of the texture, cameras ±IPD/2 apart.
+    // Pass 1: each eye into its half of the texture, both from the box centre.
     const fov = leftEyeFov(screen, device);
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
     gl.enable(gl.DEPTH_TEST);
@@ -140,11 +144,10 @@ export class StereoRenderer {
     gl.bindVertexArray(this.sceneVao);
     const uProjection = gl.getUniformLocation(this.sceneProgram, 'uProjection');
     const uView = gl.getUniformLocation(this.sceneProgram, 'uView');
-    const ipd = device.interLensDistance;
-    for (const [eye, x0, eyeX] of [['left', 0, -ipd / 2], ['right', half, ipd / 2]] as const) {
+    gl.uniformMatrix4fv(uView, false, IDENTITY);
+    for (const [eye, x0] of [['left', 0], ['right', half]] as const) {
       gl.viewport(x0, 0, half, h);
       gl.uniformMatrix4fv(uProjection, false, frustum(fov, NEAR, FAR, eye));
-      gl.uniformMatrix4fv(uView, false, translateX(-eyeX));
       gl.drawArrays(gl.TRIANGLES, 0, this.vertexCount);
     }
 

@@ -306,8 +306,9 @@ bottom = atan(distort(lensY / eye))                        ≤ fov[2] (B)
 top    = atan(distort((height_m − lensY) / eye))           ≤ fov[3] (T)
 ```
 Right eye is the mirror (swap outer/inner). Projection: asymmetric frustum
-`(−tan(outer)·near, tan(inner)·near, −tan(bottom)·near, tan(top)·near)`;
-cameras offset ±inter_lens/2.
+`(−tan(outer)·near, tan(inner)·near, −tan(bottom)·near, tan(top)·near)`.
+wwgc offset the cameras ±inter_lens/2; we render both eyes from the same
+point (see **Scene**).
 
 **Undistorted viewport** (`getLeftEyeFovAndViewportNoDistortionCorrection`):
 same quantities computed with `distortInverse(tan(maxFov))`, clamped to the
@@ -332,6 +333,21 @@ align lens centres. Keep it; make it toggleable.
 **Scene**: the camera inside a 10 m cube, back-faces textured with a
 repeating grid, each face tinted differently. Grid lines are the calibration
 target: they should look straight with right-angle corners.
+
+Changed from wwgc after testing on a real viewer:
+- **Both eyes render from the box centre** (no eye separation), so the grid
+  is optically at infinity, at the same depth as the red dots. With wwgc's
+  ±IPD/2 cameras each dot sat ~0.4° off its grid line.
+- **A bold cyan cross through each face's centre**, so on the front face it
+  runs through straight ahead, through the red dot. A purely repeating grid
+  can be fused one or two cells off (the wallpaper illusion), which hid a
+  12° vergence error in testing; the cross can't be mis-fused.
+
+Inter-lens is set by centring each dot in its lens **with one eye at a
+time**, not by making the dots merge: viewers that focus the screen at a
+finite distance make the eyes converge reflexively, so the dots double even
+when inter-lens is right. Shrinking inter-lens to force a merge moves the
+distortion centre off the real lens centre.
 
 Uniform packing from `updateBarrelDistortion` is fiddly (texture [0,1] ↔ NDC
 [−1,1] plus the viewport offset). Port it line for line first, refactor after
