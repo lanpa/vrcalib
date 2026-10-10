@@ -4,7 +4,10 @@ Copyright 2026 lanpa
 This product includes software developed at Google Inc.
   - src/profile/CardboardDevice.proto, from https://github.com/google/wwgc
     Copyright 2015 Google Inc. Licensed under the Apache License, Version 2.0.
-  - Rendering maths ported from https://github.com/google/wwgc (www/js/),
+  - src/viewer/distortion.ts, src/viewer/cardboardView.ts and the barrel
+    shader in src/viewer/shader.ts, ported from https://github.com/google/wwgc
+    (www/js/CardboardView.js, www/js/CardboardBarrelDistortion.js),
     Copyright 2015 Google Inc. Licensed under the Apache License, Version 2.0.
+    Modified to match the current Cardboard SDK (see the file headers).
 
 This is not an official Google product.

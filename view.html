@@ -3,10 +3,41 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
     <title>vrcalib viewer</title>
   </head>
   <body>
-    <p>Viewer (milestone 3).</p>
+    <canvas id="view"></canvas>
+
+    <div id="overlay" class="overlay">
+      <div class="card">
+        <h1>vrcalib viewer</h1>
+
+        <div id="unsupported" class="notice" hidden></div>
+
+        <form id="start-form" novalidate>
+          <label for="ppi">Screen pixels per inch (PPI)</label>
+          <input id="ppi" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 387" />
+          <p class="hint">
+            From the phone's spec sheet, e.g. GSMArena → Display → “ppi density”.
+          </p>
+          <p id="screen-info" class="info"></p>
+          <button id="start" type="submit">Start</button>
+          <p class="hint">
+            Goes fullscreen in landscape. Then put the phone in the viewer.
+          </p>
+          <p id="ios-note" class="notice" hidden>
+            iPhone can't run pages fullscreen, so the geometry is approximate.
+            For accurate calibration use an Android phone with Chrome.
+          </p>
+          <p id="start-problems" class="notice" hidden></p>
+        </form>
+      </div>
+    </div>
+
+    <div id="rotate" class="rotate" hidden>Rotate the phone to landscape</div>
+    <pre id="hud" class="hud" hidden></pre>
+
     <script type="module" src="/src/viewer/main.ts"></script>
   </body>
 </html>
