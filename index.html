@@ -3,12 +3,121 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
     <title>vrcalib</title>
   </head>
   <body>
-    <h1>vrcalib</h1>
-    <p>Cardboard viewer calibrator. Not an official Google product.</p>
-    <p>Profile: <code id="cfg-uri"></code></p>
+    <header class="page-header">
+      <h1>vrcalib</h1>
+      <p class="tagline">Cardboard viewer calibrator. Not an official Google product.</p>
+    </header>
+
+    <main class="layout">
+      <section class="panel" aria-labelledby="profile-heading">
+        <h2 id="profile-heading">Viewer profile</h2>
+
+        <div class="import">
+          <label for="import-input">Start from an existing profile</label>
+          <div class="import-row">
+            <input
+              id="import-input"
+              type="text"
+              placeholder="http://google.com/cardboard/cfg?p=…"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button type="button" id="import-button">Load</button>
+            <button type="button" id="reset-button" class="secondary">Reset to Cardboard v1</button>
+          </div>
+          <p id="import-status" class="status" role="status"></p>
+        </div>
+
+        <p class="hint">
+          <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> move between fields.
+          <kbd>↑</kbd> / <kbd>↓</kbd> change a number by 0.5&nbsp;mm, 0.01 (k) or 1°;
+          hold <kbd>Shift</kbd> for ×10.
+        </p>
+
+        <form id="profile-form" autocomplete="off" novalidate>
+          <fieldset>
+            <legend>Viewer</legend>
+            <div class="row">
+              <label>Vendor <input name="vendor" type="text" spellcheck="false" /></label>
+              <label>Model <input name="model" type="text" spellcheck="false" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Geometry</legend>
+            <div class="row">
+              <label>Screen to lens <span class="num"><input name="screenToLens" data-num /><span class="unit">mm</span></span></label>
+              <label>Inter-lens <span class="num"><input name="interLens" data-num /><span class="unit">mm</span></span></label>
+            </div>
+            <div class="row">
+              <label>Vertical alignment
+                <select name="verticalAlignment">
+                  <option value="0">Bottom (tray)</option>
+                  <option value="1">Center</option>
+                  <option value="2">Top</option>
+                </select>
+              </label>
+              <label>Tray to lens <span class="num"><input name="trayToLens" data-num /><span class="unit">mm</span></span></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Distortion</legend>
+            <div class="row">
+              <label>k1 <span class="num"><input name="k1" data-num /></span></label>
+              <label>k2 <span class="num"><input name="k2" data-num /></span></label>
+            </div>
+            <figure class="curve">
+              <svg id="curve" role="img" aria-labelledby="curve-caption"></svg>
+              <figcaption id="curve-caption"></figcaption>
+            </figure>
+          </fieldset>
+
+          <fieldset>
+            <legend>Field of view (left eye)</legend>
+            <div class="row four">
+              <label>Outer <span class="num"><input name="fovL" data-num /><span class="unit">°</span></span></label>
+              <label>Inner <span class="num"><input name="fovR" data-num /><span class="unit">°</span></span></label>
+              <label>Bottom <span class="num"><input name="fovB" data-num /><span class="unit">°</span></span></label>
+              <label>Top <span class="num"><input name="fovT" data-num /><span class="unit">°</span></span></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Input</legend>
+            <div class="row">
+              <label class="check"><input name="hasMagnet" type="checkbox" /> Has a magnet</label>
+              <label>Primary button
+                <select name="primaryButton">
+                  <option value="0">None</option>
+                  <option value="1">Magnet</option>
+                  <option value="2">Touch</option>
+                  <option value="3">Indirect touch (button taps the screen)</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+        </form>
+      </section>
+
+      <section class="panel output" aria-labelledby="export-heading">
+        <h2 id="export-heading">Export</h2>
+        <p class="hint">Scan this QR code with a Cardboard app to use the profile.</p>
+        <canvas id="qr" width="240" height="240" aria-label="Profile QR code"></canvas>
+        <div class="buttons">
+          <button type="button" id="download-button">Download PNG</button>
+          <button type="button" id="copy-button" class="secondary">Copy link</button>
+        </div>
+        <p id="copy-status" class="status" role="status"></p>
+        <code id="cfg-uri" class="uri"></code>
+        <ul id="warnings" class="warnings"></ul>
+      </section>
+    </main>
+
     <script type="module" src="/src/editor/main.ts"></script>
   </body>
 </html>
