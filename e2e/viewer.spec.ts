@@ -82,7 +82,7 @@ test('red centre dots sit at the computed lens centres, on the centre cross', as
   // so just beside it, along both arms, is cross colour, in both eyes.
   const isCross = ([r, g, b]: number[]) => r! < 140 && g! > 170 && b! > 200;
   for (const x of [leftX, rightX]) {
-    for (const [dx, dy] of [[10, 0], [-10, 0], [0, 10], [0, -10]]) {
+    for (const [dx, dy] of [[10, 0], [-10, 0], [0, 10], [0, -10]] as const) {
       expect(isCross(await probe(page, x + dx, lensY + dy)), `cross at ${x + dx},${lensY + dy}`).toBe(true);
     }
   }
