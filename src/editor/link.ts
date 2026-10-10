@@ -18,6 +18,7 @@ export class PhoneLink {
   private readonly els: LinkElements;
   private session: EditorSession | null = null;
   private latest: SessionState | null = null;
+  private phones = 0;
 
   constructor(els: LinkElements) {
     this.els = els;
@@ -43,9 +44,13 @@ export class PhoneLink {
       await drawQr(this.els.pairQr, viewerUrl, 200);
 
       this.setState('waiting');
+      // A write that goes through after an error (e.g. rules fixed meanwhile) clears it.
+      session.onWritten = () => {
+        if (this.els.status.dataset.state === 'error') this.showPresence();
+      };
       session.watchPresence((n) => {
-        if (this.els.status.dataset.state === 'error') return;
-        this.setState(n > 0 ? 'phone' : 'waiting', n);
+        this.phones = n;
+        if (this.els.status.dataset.state !== 'error') this.showPresence();
       });
       if (!resumed && this.latest) session.write(this.latest);
       return resumed;
@@ -58,6 +63,10 @@ export class PhoneLink {
   update(state: SessionState): void {
     this.latest = state;
     this.session?.write(state);
+  }
+
+  private showPresence(): void {
+    this.setState(this.phones > 0 ? 'phone' : 'waiting', this.phones);
   }
 
   private fail(e: Error): void {

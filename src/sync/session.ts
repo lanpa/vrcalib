@@ -52,6 +52,8 @@ export class EditorSession {
   readonly sid: string;
   private readonly uid: string;
   private readonly onError: (e: Error) => void;
+  /** Called after each write the database accepted. */
+  onWritten: () => void = () => {};
 
   private constructor(sid: string, uid: string, onError: (e: Error) => void) {
     this.sid = sid;
@@ -91,8 +93,9 @@ export class EditorSession {
       ...(state.screenWidthMm === null ? {} : { screen_width_mm: state.screenWidthMm }),
       updated: serverTimestamp(),
     };
-    set(ref(db, `sessions/${this.sid}`), value).catch((e: unknown) =>
-      this.onError(e instanceof Error ? e : new Error(String(e))),
+    set(ref(db, `sessions/${this.sid}`), value).then(
+      () => this.onWritten(),
+      (e: unknown) => this.onError(e instanceof Error ? e : new Error(String(e))),
     );
   }
 
