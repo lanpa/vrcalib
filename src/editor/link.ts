@@ -2,6 +2,7 @@
 // session, shows the pairing QR and the phone's presence, and pushes every
 // change. The editor keeps working if any of this fails.
 
+import { describeError } from '../sync/errors';
 import type { EditorSession, SessionState } from '../sync/session';
 import { drawQr } from './qr';
 
@@ -62,7 +63,7 @@ export class PhoneLink {
   private fail(e: Error): void {
     this.setState('error');
     this.els.status.textContent =
-      `Live link unavailable (${e.message}). The editor still works, but the phone won't update.`;
+      `Live link unavailable (${describeError(e)}). The editor still works, but the phone won't update.`;
   }
 
   private setState(state: LinkState, phones = 0): void {

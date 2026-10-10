@@ -1,5 +1,6 @@
 import './viewer.css';
 import { parseProfileInput, toCfgUri, type DeviceParams } from '../profile/codec';
+import { describeError } from '../sync/errors';
 import { defaultParams } from '../profile/defaults';
 import { normalize } from '../profile/rules';
 import { heightMeters, leftEyeFov, widthMeters, type Screen } from './cardboardView';
@@ -188,10 +189,10 @@ if (!sid) {
             setLink('error', e instanceof Error ? e.message : String(e));
           }
         },
-        (e) => setLink('error', e.message),
+        (e) => setLink('error', describeError(e)),
       );
     })
-    .catch((e: unknown) => setLink('error', e instanceof Error ? e.message : String(e)));
+    .catch((e: unknown) => setLink('error', describeError(e)));
 }
 (window as unknown as { vrcalib: unknown }).vrcalib = {
   setDevice,

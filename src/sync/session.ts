@@ -25,6 +25,7 @@ export interface SessionState {
 
 const SID_PATTERN = /^[A-Za-z0-9_-]{22}$/;
 
+
 export const isSessionId = (s: string | null): s is string => s !== null && SID_PATTERN.test(s);
 
 /** 128 random bits, base64url: 22 characters. */
